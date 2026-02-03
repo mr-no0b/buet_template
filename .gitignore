@@ -7,8 +7,9 @@
 *.toc
 contents.tex
 
-## Minted directory
-_minted-notebook/*
+## Generated LaTeX code directory and minted
+.latex_code/
+_minted/
 
 ## Ignore vim swp files
 *.swp

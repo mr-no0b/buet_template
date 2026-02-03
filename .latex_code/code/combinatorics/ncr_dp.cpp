@@ -1,1 +1,0 @@
-/home/lionking/Desktop/BUET TEMPLATE/Template_Script/code/combinatorics/ncr dp.cpp

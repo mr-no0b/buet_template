@@ -1,8 +1,0 @@
-\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
-Covering Problems: 
-\PYGZgt{} Maximum Independent Set(Bipartite): Largest set of nodes which do not have any edge between them. sol: V\PYGZhy{}(MaxMatching) 
-\PYGZgt{} Minimum Vertex Cover(Bipartite): \PYGZhy{}Smallest set of nodes to cover all the edges \PYGZhy{}sol: MaxMatching 
-\PYGZgt{} Minimum Edge Cover(General graph): \PYGZhy{}Smallest set of edges to cover all the nodes \PYGZhy{}sol: V\PYGZhy{}(MaxMatching) (if edge cover exists, does not exit for isolated nodes) 
-\PYGZgt{} Minimum Path Cover(Vertex disjoint) DAG: \PYGZhy{}Minimum number of vertex disjoint paths that visit all the nodes \PYGZhy{}sol: make a bipartite graph using same nodes in two sides, one side is \PYGZdq{}from\PYGZdq{} other is \PYGZdq{}to\PYGZdq{}, add edges from \PYGZdq{}from\PYGZdq{} to \PYGZdq{}to\PYGZdq{}, then ans is V\PYGZhy{}(MaxMatching) 
-\PYGZgt{} Minimum Path Cover(Vertex Not Disjoint) General graph: \PYGZhy{}Minimum number of paths that visit all the nodes \PYGZhy{}sol: consider cycles as nodes then it will become a path cover problem with vertex disjoint on DAG
-\end{MintedVerbatim}
