@@ -1,0 +1,99 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+cm}{/*}
+\PYG{c+cm}{sometimes i need to modify the find() function}
+\PYG{c+cm}{first of all add all expreinece as team[u]}
+\PYG{c+cm}{then when join() make self[v] = team[v] \PYGZhy{} team[u]}
+\PYG{c+cm}{so for v the ans still team[v] = self[v] + team[u]}
+\PYG{c+cm}{and when we find some other parents }
+\PYG{c+cm}{then the added points add to all players of a team }
+\PYG{c+cm}{so we do self[v] += self[p] so here self[p] }
+\PYG{c+cm}{*/}
+\PYG{k}{struct}\PYG{+w}{ }\PYG{n+nc}{DSU}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{ll}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{par}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sz}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{DSU}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{par}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sz}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{iota}\PYG{p}{(}\PYG{n}{par}\PYG{p}{.}\PYG{n}{begin}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{par}\PYG{p}{.}\PYG{n}{end}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{par}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{?}\PYG{+w}{ }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{par}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{par}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k+kt}{bool}\PYG{+w}{ }\PYG{n}{same}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{u}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{v}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{get\PYGZus{}size}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{sz}\PYG{p}{[}\PYG{n}{find}\PYG{p}{(}\PYG{n}{v}\PYG{p}{)}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{join}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{u}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{u}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{v}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{n}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{rank}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{swap}\PYG{p}{(}\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{par}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{sz}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{sz}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{rank}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{o}{+}\PYG{o}{+}\PYG{p}{;}
+\PYG{+w}{        }\PYG{c+c1}{// u is the parent;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\PYG{k}{struct}\PYG{+w}{ }\PYG{n+nc}{DSU}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{ll}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{par}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sz}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sum}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{elemwhichnode}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{nextId}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{DSU}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{m}\PYG{p}{)}
+\PYG{+w}{        }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{par}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{m}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{m}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sz}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{m}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{,}
+\PYG{+w}{          }\PYG{n}{sum}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{m}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{elemwhichnode}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{nextId}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{iota}\PYG{p}{(}\PYG{n}{par}\PYG{p}{.}\PYG{n}{begin}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{par}\PYG{p}{.}\PYG{n}{end}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{+}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n}{elemwhichnode}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{;}\PYG{+w}{        }
+\PYG{+w}{            }\PYG{n}{sum}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{;}\PYG{+w}{             }
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{join}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{u}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{u}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{v}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{if}\PYG{p}{(}\PYG{n}{u}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{n}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{rank}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{swap}\PYG{p}{(}\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{par}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{sz}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{sz}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{sum}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{sum}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{rank}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{rank}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{o}{+}\PYG{o}{+}\PYG{p}{;}
+\PYG{+w}{        }\PYG{c+c1}{// u is the parent;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{erase}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{nv}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{elemwhichnode}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{nv}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}\PYG{p}{;}\PYG{+w}{            }\PYG{c+c1}{// already deleted}
+\PYG{+w}{        }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{pv}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{nv}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{sz}\PYG{+w}{ }\PYG{p}{[}\PYG{n}{pv}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{sum}\PYG{p}{[}\PYG{n}{pv}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{elemwhichnode}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{               }\PYG{c+c1}{// mark deleted}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{c+cm}{/* move p \PYGZhy{}\PYGZgt{} set(q) */}
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{move}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{if}\PYG{p}{(}\PYG{n}{elemwhichnode}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}\PYG{p}{;}
+\PYG{+w}{        }
+\PYG{+w}{        }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{pu}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{elemwhichnode}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{pv}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{elemwhichnode}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{pu}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{pv}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}\PYG{p}{;}\PYG{+w}{  }
+
+\PYG{+w}{        }\PYG{n}{erase}\PYG{p}{(}\PYG{n}{u}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{+w}{        }\PYG{n}{nextId}\PYG{o}{+}\PYG{o}{+}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{par}\PYG{+w}{ }\PYG{p}{[}\PYG{n}{nextId}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{nextId}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{rank}\PYG{p}{[}\PYG{n}{nextId}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{sz}\PYG{+w}{  }\PYG{p}{[}\PYG{n}{nextId}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{sum}\PYG{+w}{ }\PYG{p}{[}\PYG{n}{nextId}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{;}
+
+\PYG{+w}{        }\PYG{n}{elemwhichnode}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{nextId}\PYG{p}{;}
+
+\PYG{+w}{        }\PYG{n}{join}\PYG{p}{(}\PYG{n}{nextId}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{pv}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{n}{pair}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ll}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{query}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{p}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{r}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{find}\PYG{p}{(}\PYG{n}{elemwhichnode}\PYG{p}{[}\PYG{n}{p}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{p}{)}\PYG{n}{sz}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sum}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]}\PYG{+w}{ }\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\end{MintedVerbatim}

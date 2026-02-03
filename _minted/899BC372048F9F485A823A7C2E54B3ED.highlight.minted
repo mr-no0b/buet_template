@@ -1,0 +1,152 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+cm}{/* Minimum Cost Maximum Flow (MCMF)}
+\PYG{c+cm}{ * Works for both directed and undirected graphs, and supports negative edge costs.}
+\PYG{c+cm}{ * Does NOT work with negative cost cycles.}
+\PYG{c+cm}{ * For undirected edges, set `directed = false`.}
+\PYG{c+cm}{ * Complexity: O(min(E\PYGZca{}2 * V log V, E log V * flow))}
+\PYG{c+cm}{ * Usage:}
+\PYG{c+cm}{ *   MCMF mcmf(n);                     // Initialize with n nodes (0\PYGZhy{}indexed)}
+\PYG{c+cm}{ *   mcmf.add\PYGZus{}edge(u, v, cap, cost);  // Add edge from u to v with capacity and cost}
+\PYG{c+cm}{ *   auto [maxFlow, minCost] = mcmf.solve(source, sink);}
+\PYG{c+cm}{ */}
+
+\PYG{k}{using}\PYG{+w}{ }\PYG{n}{T}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kt}{long}\PYG{+w}{ }\PYG{k+kt}{long}\PYG{p}{;}
+\PYG{k}{const}\PYG{+w}{ }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{inf}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{1L}\PYG{n}{L}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{l+m+mi}{61}\PYG{p}{;}
+
+\PYG{k}{struct}\PYG{+w}{ }\PYG{n+nc}{MCMF}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{k}{struct}\PYG{+w}{ }\PYG{n+nc}{edge}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{cap}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{id}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{edge}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{\PYGZus{}u}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{\PYGZus{}v}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{\PYGZus{}cap}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{\PYGZus{}cost}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{\PYGZus{}id}\PYG{p}{)}
+\PYG{+w}{      }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{(}\PYG{n}{\PYGZus{}u}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{(}\PYG{n}{\PYGZus{}v}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cap}\PYG{p}{(}\PYG{n}{\PYGZus{}cap}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{(}\PYG{n}{\PYGZus{}cost}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{id}\PYG{p}{(}\PYG{n}{\PYGZus{}id}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+
+\PYG{+w}{  }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{s}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{t}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{mxid}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{flow}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k+kt}{bool}\PYG{+w}{ }\PYG{n}{neg}\PYG{p}{;}
+
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{;}\PYG{+w}{    }\PYG{c+c1}{// Adjacency list: g[u] = indices of edges}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{edge}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{;}\PYG{+w}{           }\PYG{c+c1}{// Edge list}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{T}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{potential}\PYG{p}{;}\PYG{+w}{   }\PYG{c+c1}{// d = distances in Dijkstra; potential = reduced costs}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{T}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{flow\PYGZus{}through}\PYG{p}{;}\PYG{+w}{   }\PYG{c+c1}{// Stores flow pushed through original edges by ID}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{par}\PYG{p}{;}\PYG{+w}{          }\PYG{c+c1}{// Parent edge index in path}
+
+\PYG{+w}{  }\PYG{c+c1}{// Default constructor}
+\PYG{+w}{  }\PYG{n}{MCMF}\PYG{p}{(}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{  }\PYG{c+c1}{// Initialize graph with n nodes (0\PYGZhy{}based indexing)}
+\PYG{+w}{  }\PYG{n}{MCMF}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{\PYGZus{}n}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{n}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{\PYGZus{}n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{10}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{g}\PYG{p}{.}\PYG{n}{assign}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{neg}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{false}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{mxid}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{  }\PYG{c+c1}{// Adds an edge from u to v with given capacity and cost}
+\PYG{+w}{  }\PYG{c+c1}{// If directed = false, adds edge in both directions}
+\PYG{+w}{  }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{add\PYGZus{}edge}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{cap}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{bool}\PYG{+w}{ }\PYG{n}{directed}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{true}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{cost}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{neg}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{true}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{g}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{e}\PYG{p}{.}\PYG{n}{size}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{e}\PYG{p}{.}\PYG{n}{emplace\PYGZus{}back}\PYG{p}{(}\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cap}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{id}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{g}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{e}\PYG{p}{.}\PYG{n}{size}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{e}\PYG{p}{.}\PYG{n}{emplace\PYGZus{}back}\PYG{p}{(}\PYG{n}{v}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{n}{cost}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// Reverse edge}
+\PYG{+w}{    }\PYG{n}{mxid}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{max}\PYG{p}{(}\PYG{n}{mxid}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{id}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{!}\PYG{n}{directed}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{add\PYGZus{}edge}\PYG{p}{(}\PYG{n}{v}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cap}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nb}{true}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{ }\PYG{c+c1}{// Add reverse only once}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{  }\PYG{c+c1}{// Dijkstra with potentials (Johnson\PYGZsq{}s algorithm) to find shortest path}
+\PYG{+w}{  }\PYG{k+kt}{bool}\PYG{+w}{ }\PYG{n}{dijkstra}\PYG{p}{(}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{par}\PYG{p}{.}\PYG{n}{assign}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{d}\PYG{p}{.}\PYG{n}{assign}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{inf}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{priority\PYGZus{}queue}\PYG{o}{\PYGZlt{}}\PYG{n}{pair}\PYG{o}{\PYGZlt{}}\PYG{n}{T}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{o}{\PYGZgt{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{pair}\PYG{o}{\PYGZlt{}}\PYG{n}{T}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{o}{\PYGZgt{}}\PYG{o}{\PYGZgt{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{greater}\PYG{o}{\PYGZlt{}}\PYG{o}{\PYGZgt{}}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{q}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{n}{d}\PYG{p}{[}\PYG{n}{s}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{q}\PYG{p}{.}\PYG{n}{emplace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{s}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{!}\PYG{n}{q}\PYG{p}{.}\PYG{n}{empty}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{q}\PYG{p}{.}\PYG{n}{top}\PYG{p}{(}\PYG{p}{)}\PYG{p}{.}\PYG{n}{second}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{nw}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{q}\PYG{p}{.}\PYG{n}{top}\PYG{p}{(}\PYG{p}{)}\PYG{p}{.}\PYG{n}{first}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{q}\PYG{p}{.}\PYG{n}{pop}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{nw}\PYG{+w}{ }\PYG{o}{!}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{continue}\PYG{p}{;}
+
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{p}{.}\PYG{n}{v}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{cap}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cap}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cost}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{potential}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n}{potential}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{;}\PYG{+w}{ }\PYG{c+c1}{// Reduced cost}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{cap}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{w}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{          }\PYG{n}{d}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{w}\PYG{p}{;}
+\PYG{+w}{          }\PYG{n}{par}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{;}
+\PYG{+w}{          }\PYG{n}{q}\PYG{p}{.}\PYG{n}{emplace}\PYG{p}{(}\PYG{n}{d}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{+}\PYG{o}{+}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{d}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{inf}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{potential}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{p}{;}\PYG{+w}{ }\PYG{c+c1}{// Update potentials}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{t}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{!}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{inf}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// True if sink is reachable}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{  }\PYG{c+c1}{// DFS\PYGZhy{}style recursive flow sending function}
+\PYG{+w}{  }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{send\PYGZus{}flow}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{cur}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{par}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{cur}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{par}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{id}\PYG{p}{]}\PYG{p}{.}\PYG{n}{u}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{id}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cost}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{f}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{send\PYGZus{}flow}\PYG{p}{(}\PYG{n}{u}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{min}\PYG{p}{(}\PYG{n}{cur}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{id}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cap}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{cost}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{f}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{w}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{e}\PYG{p}{[}\PYG{n}{id}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cap}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{f}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{e}\PYG{p}{[}\PYG{n}{id}\PYG{+w}{ }\PYG{o}{\PYGZca{}}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cap}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{f}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// Update reverse edge}
+\PYG{+w}{    }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{f}\PYG{p}{;}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{  }\PYG{c+c1}{// Main function to compute minimum cost max flow from s to t}
+\PYG{+w}{  }\PYG{c+c1}{// Optionally limit total flow with `goal`}
+\PYG{+w}{  }\PYG{c+c1}{// Returns \PYGZob{}maximum flow, minimum cost\PYGZcb{}}
+\PYG{+w}{  }\PYG{n}{pair}\PYG{o}{\PYGZlt{}}\PYG{n}{T}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{solve}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{\PYGZus{}s}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{\PYGZus{}t}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{goal}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{inf}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{s}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{\PYGZus{}s}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{t}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{\PYGZus{}t}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{flow}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{cost}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{potential}\PYG{p}{.}\PYG{n}{assign}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{c+c1}{// If negative costs exist, use Bellman\PYGZhy{}Ford to initialize potentials}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{neg}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{d}\PYG{p}{.}\PYG{n}{assign}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{inf}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{d}\PYG{p}{[}\PYG{n}{s}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{relax}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{true}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{relax}\PYG{p}{;}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{+}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{relax}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{false}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{u}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{+}\PYG{n}{u}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{          }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{d}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{inf}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{continue}\PYG{p}{;}
+\PYG{+w}{          }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]}\PYG{p}{.}\PYG{n}{v}\PYG{p}{;}
+\PYG{+w}{            }\PYG{n}{T}\PYG{+w}{ }\PYG{n}{cap}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cap}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cost}\PYG{p}{;}
+\PYG{+w}{            }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{cap}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{w}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{              }\PYG{n}{d}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{w}\PYG{p}{;}
+\PYG{+w}{              }\PYG{n}{relax}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{true}\PYG{p}{;}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{          }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{+}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{d}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{inf}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{potential}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{d}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{c+c1}{// Repeatedly find augmenting paths using Dijkstra + potential}
+\PYG{+w}{    }\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{flow}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{goal}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{dijkstra}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{flow}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{send\PYGZus{}flow}\PYG{p}{(}\PYG{n}{t}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{goal}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n}{flow}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{c+c1}{// Track flow through original edges (by ID)}
+\PYG{+w}{    }\PYG{n}{flow\PYGZus{}through}\PYG{p}{.}\PYG{n}{assign}\PYG{p}{(}\PYG{n}{mxid}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{10}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{u}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{u}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{+}\PYG{n}{u}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{idx}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{[}\PYG{n}{u}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{e}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]}\PYG{p}{.}\PYG{n}{id}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{          }\PYG{n}{flow\PYGZus{}through}\PYG{p}{[}\PYG{n}{e}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]}\PYG{p}{.}\PYG{n}{id}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{e}\PYG{p}{[}\PYG{n}{idx}\PYG{+w}{ }\PYG{o}{\PYGZca{}}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{p}{.}\PYG{n}{cap}\PYG{p}{;}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k}{return}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{n}{flow}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\end{MintedVerbatim}

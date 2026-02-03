@@ -1,5 +1,9 @@
 \documentclass[8pt, a4paper, onesided]{article}
 \usepackage[left=0.1in,right=0.1in,top=0.25in,bottom=0.1in,headsep=0.05in]{geometry}
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Latin Modern Roman}
+\setmonofont{Latin Modern Mono}[Scale=MatchLowercase]
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage{listings}
@@ -12,6 +16,14 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{newunicodechar}
+
+% Map Unicode math symbols for code blocks
+\newunicodechar{⊆}{\ensuremath{\subseteq}}
+\newunicodechar{⊇}{\ensuremath{\supseteq}}
+\newunicodechar{∑}{\ensuremath{\sum}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{≥}{\ensuremath{\geq}}
 
 \usemintedstyle{default}
 
@@ -42,22 +54,22 @@
 \lstset{escapechar=\$}
 
 \setminted{breaklines, breaksymbolleft=\space,
-breakafter={,+-*;>=}, breakbefore={</}, tabsize=2, obeytabs, mathescape, frame=topline, framesep=3pt, fontsize=\fontsize{9}{9}}
+breakafter={,+-*;>=}, breakbefore={</}, tabsize=2, obeytabs, mathescape, frame=topline, framesep=3pt, fontsize=\fontsize{9}{9}, encoding=utf8}
 
 \pagestyle{fancy}
-\fancyhead[L]{KUET\_Effervescent Team Notebook - \today}
+\fancyhead[L]{KUET\_Xtinction Team Notebook - \today}
 \fancyhead[R]{\thepage}
 \fancyfoot[C]{}
 
 \fancypagestyle{plain}
 {
-\fancyhead[L]{KUET\_Effervescent Team Notebook - \today}
+\fancyhead[L]{KUET\_Xtinction Team Notebook - \today}
 \fancyhead[R]{\thepage}
 \fancyfoot[C]{}
 }
 
-\title{\vspace{-2.5ex}KUET\_Effervescent Team Notebook}
-\author{Md. Mehrab Hossain Opi, Arnob Sarker,\\Sharif Minhazul Islam}
+\title{\vspace{-2.5ex}KUET\_Xtinction Team Notebook}
+\author{Md Umar Faruk, Raihan Arefin,\\Md. Arifur Rahman}
 \date{}
 
 \graphicspath{ {./images} }
@@ -73,7 +85,7 @@ breakafter={,+-*;>=}, breakbefore={</}, tabsize=2, obeytabs, mathescape, frame=t
 
 \begin{document}
 \begin{landscape}
-\begin{multicols*}{3}
+\begin{multicols*}{4}
 
 \maketitle
 \vspace{-7ex}

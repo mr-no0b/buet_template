@@ -1,0 +1,88 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+c1}{// Finds Maximum Matching in a General Graph using Edmonds\PYGZsq{} Blossom Algorithm}
+\PYG{c+c1}{// Returns: vector\PYGZlt{}int\PYGZgt{} mate where mate[i] = j means node i is matched with node j}
+\PYG{c+c1}{// Complexity: O(N * M), where N = number of nodes, M = number of edges}
+\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{Blossom}\PYG{p}{(}\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{o}{\PYGZgt{}}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{graph}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{graph}\PYG{p}{.}\PYG{n}{size}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{           }\PYG{c+c1}{// Number of nodes}
+\PYG{+w}{  }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{timer}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{;}\PYG{+w}{                 }\PYG{c+c1}{// Used for tracking during LCA search}
+
+\PYG{+w}{  }\PYG{c+c1}{// mate[i] = j means i is matched with j (or \PYGZhy{}1 if unmatched)}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{mate}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{label}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{          }\PYG{c+c1}{// Labels: \PYGZhy{}1 = unused, 0 = even level, 1 = odd level}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{parent}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{         }\PYG{c+c1}{// BFS tree parent}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{orig}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{           }\PYG{c+c1}{// Original base of blossom for each node}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{aux}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{        }\PYG{c+c1}{// Aux array used in LCA finding}
+\PYG{+w}{  }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{q}\PYG{p}{;}\PYG{+w}{                 }\PYG{c+c1}{// BFS queue}
+
+\PYG{+w}{  }\PYG{c+c1}{// Finds the Lowest Common Ancestor (LCA) of x and y in the alternating tree}
+\PYG{+w}{  }\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{lca}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[}\PYG{o}{\PYGZam{}}\PYG{p}{]}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{y}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{timer}\PYG{o}{+}\PYG{o}{+}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// Increase visit timestamp}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{p}{;}\PYG{+w}{ }\PYG{p}{;}\PYG{+w}{ }\PYG{n}{swap}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{y}\PYG{p}{)}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{continue}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{aux}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{timer}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// Found LCA}
+\PYG{+w}{      }\PYG{n}{aux}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{timer}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{mate}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{+w}{ }\PYG{o}{?}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{orig}\PYG{p}{[}\PYG{n}{parent}\PYG{p}{[}\PYG{n}{mate}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{p}{]}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// Move up the alternating tree}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+
+\PYG{+w}{  }\PYG{c+c1}{// Contracts a blossom (odd\PYGZhy{}length cycle) found during BFS}
+\PYG{+w}{  }\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{blossom}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[}\PYG{o}{\PYGZam{}}\PYG{p}{]}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{w}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{c+c1}{// v and w are two endpoints; a is the LCA}
+\PYG{+w}{    }\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{orig}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{!}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{parent}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{w}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mate}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{label}\PYG{p}{[}\PYG{n}{w}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{label}\PYG{p}{[}\PYG{n}{w}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{q}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{w}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// Re\PYGZhy{}add to BFS queue}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{n}{orig}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{orig}\PYG{p}{[}\PYG{n}{w}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// Update base of blossom}
+\PYG{+w}{      }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{parent}\PYG{p}{[}\PYG{n}{w}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+
+\PYG{+w}{  }\PYG{c+c1}{// Augments along the alternating path ending at v to increase the matching}
+\PYG{+w}{  }\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{augment}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[}\PYG{o}{\PYGZam{}}\PYG{p}{]}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{v}\PYG{+w}{ }\PYG{o}{!}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{pv}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{parent}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{nv}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mate}\PYG{p}{[}\PYG{n}{pv}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{mate}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{pv}\PYG{p}{;}\PYG{+w}{      }\PYG{c+c1}{// Match v with its parent}
+\PYG{+w}{      }\PYG{n}{mate}\PYG{p}{[}\PYG{n}{pv}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{nv}\PYG{p}{;}\PYG{+w}{            }\PYG{c+c1}{// Continue on the unmatched end}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+
+\PYG{+w}{  }\PYG{c+c1}{// Breadth\PYGZhy{}First Search to find an augmenting path starting from root}
+\PYG{+w}{  }\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{bfs}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[}\PYG{o}{\PYGZam{}}\PYG{p}{]}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{root}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{fill}\PYG{p}{(}\PYG{n}{label}\PYG{p}{.}\PYG{n}{begin}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{label}\PYG{p}{.}\PYG{n}{end}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{    }\PYG{c+c1}{// Reset labels}
+\PYG{+w}{    }\PYG{n}{iota}\PYG{p}{(}\PYG{n}{orig}\PYG{p}{.}\PYG{n}{begin}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{orig}\PYG{p}{.}\PYG{n}{end}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{       }\PYG{c+c1}{// Each node is its own blossom initially}
+\PYG{+w}{    }\PYG{n}{q}\PYG{p}{.}\PYG{n}{clear}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{                               }\PYG{c+c1}{// Reset BFS queue}
+
+\PYG{+w}{    }\PYG{n}{label}\PYG{p}{[}\PYG{n}{root}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{                          }\PYG{c+c1}{// Start root at even level}
+\PYG{+w}{    }\PYG{n}{q}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{root}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{p}{)}\PYG{n}{q}\PYG{p}{.}\PYG{n}{size}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{+}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{v}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{q}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{x}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{graph}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{label}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{          }\PYG{c+c1}{// If x is unvisited}
+\PYG{+w}{          }\PYG{n}{label}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{       }\PYG{c+c1}{// Mark as odd level}
+\PYG{+w}{          }\PYG{n}{parent}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{;}
+\PYG{+w}{          }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{mate}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}\PYG{+w}{  }\PYG{c+c1}{// Found an augmenting path}
+\PYG{+w}{            }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{augment}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}
+\PYG{+w}{          }\PYG{n}{label}\PYG{p}{[}\PYG{n}{mate}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// Next level (even)}
+\PYG{+w}{          }\PYG{n}{q}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{mate}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{        }\PYG{k}{else}\PYG{+w}{ }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{label}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{orig}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{!}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{orig}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{          }\PYG{c+c1}{// Found a blossom (x and v have the same label and different bases)}
+\PYG{+w}{          }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{a}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{lca}\PYG{p}{(}\PYG{n}{orig}\PYG{p}{[}\PYG{n}{v}\PYG{p}{]}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{orig}\PYG{p}{[}\PYG{n}{x}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{          }\PYG{n}{blossom}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{v}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{          }\PYG{n}{blossom}\PYG{p}{(}\PYG{n}{v}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k}{return}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// No augmenting path found}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+
+\PYG{+w}{  }\PYG{c+c1}{// Try to find augmenting paths starting from unmatched nodes}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{+}\PYG{o}{+}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{mate}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{)}
+\end{MintedVerbatim}

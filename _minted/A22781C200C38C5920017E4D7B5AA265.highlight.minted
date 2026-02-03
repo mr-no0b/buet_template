@@ -1,0 +1,19 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+cp}{\PYGZsh{}}\PYG{c+cp}{define ckbit(n, k) (((n)\PYGZgt{}\PYGZgt{}(k)) \PYGZam{} 1)}
+\PYG{c+cp}{\PYGZsh{}}\PYG{c+cp}{define toggle(n, k) ((n) \PYGZca{}= (1LL \PYGZlt{}\PYGZlt{} (k)))}
+\PYG{c+cp}{\PYGZsh{}}\PYG{c+cp}{define setbit(n, k) ((n) |= (1LL \PYGZlt{}\PYGZlt{} (k)))}
+\PYG{c+cp}{\PYGZsh{}}\PYG{c+cp}{define unsetbit(n, k) ((n) \PYGZam{}= \PYGZti{}(1LL \PYGZlt{}\PYGZlt{} (k)))}
+\PYG{c+cp}{\PYGZsh{}}\PYG{c+cp}{define lowbit(n) ((n) \PYGZam{} \PYGZhy{}(n))}
+\PYG{c+cp}{\PYGZsh{}}\PYG{c+cp}{define highbit(n) (63 \PYGZhy{} \PYGZus{}\PYGZus{}builtin\PYGZus{}clzll(n)) }\PYG{c+c1}{// = floor log2(n)}
+\PYG{c+c1}{// a|b = a\PYGZca{}b + a\PYGZam{}b}
+\PYG{c+c1}{// a \PYGZca{} (a\PYGZam{}b) = b \PYGZca{} (a|b)}
+\PYG{c+c1}{// (a\PYGZam{}b) \PYGZca{} (a|b) = a\PYGZca{}b}
+
+\PYG{c+c1}{// a+b = a|b + a\PYGZam{}b}
+\PYG{c+c1}{// a+b = a\PYGZca{}b + 2(a\PYGZam{}b)}
+
+\PYG{c+c1}{// a\PYGZhy{}b = (a\PYGZca{}(a\PYGZam{}b))\PYGZhy{}((a|b)\PYGZca{}a)}
+\PYG{c+c1}{// a\PYGZhy{}b = ((a|b)\PYGZca{}b)\PYGZhy{}((a|b)\PYGZca{}a)}
+\PYG{c+c1}{// a\PYGZhy{}b = (a\PYGZca{}(a\PYGZam{}b))\PYGZhy{}(b\PYGZca{}(a\PYGZam{}b))}
+\PYG{c+c1}{// a\PYGZhy{}b = ((a|b)\PYGZca{}b)\PYGZhy{}(b\PYGZca{}(a\PYGZam{}b))}
+\end{MintedVerbatim}

@@ -1,0 +1,62 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k}{struct}\PYG{+w}{ }\PYG{n+nc}{Hungerian}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{worker}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{job}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{parentjob}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{matchjob}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{assign}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{Hungerian}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{cost}\PYG{p}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{worker}\PYG{p}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{job}\PYG{p}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{parentjob}\PYG{p}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{matchjob}\PYG{p}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{solve}\PYG{p}{(}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{w}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{w}\PYG{o}{+}\PYG{o}{+}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n}{matchjob}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{w}\PYG{p}{;}
+\PYG{+w}{            }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{minslack}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{INT\PYGZus{}MAX}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{            }\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{bool}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{used}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{            }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{job0}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{            }\PYG{k}{do}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{n}{used}\PYG{p}{[}\PYG{n}{job0}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{true}\PYG{p}{;}
+\PYG{+w}{                }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{worker0}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{matchjob}\PYG{p}{[}\PYG{n}{job0}\PYG{p}{]}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{delta}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{INT\PYGZus{}MAX}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{job1}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{                }\PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{+}\PYG{o}{+}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                    }\PYG{k}{if}\PYG{p}{(}\PYG{o}{!}\PYG{n}{used}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                        }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{curcost}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{cost}\PYG{p}{[}\PYG{n}{worker0}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{p}{[}\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n}{worker}\PYG{p}{[}\PYG{n}{worker0}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n}{job}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{                        }\PYG{k}{if}\PYG{p}{(}\PYG{n}{curcost}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{minslack}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                            }\PYG{n}{minslack}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{curcost}\PYG{p}{;}
+\PYG{+w}{                            }\PYG{n}{parentjob}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{job0}\PYG{p}{;}
+\PYG{+w}{                        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{                        }\PYG{k}{if}\PYG{p}{(}\PYG{n}{minslack}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{delta}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                            }\PYG{n}{delta}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{minslack}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{                            }\PYG{n}{job1}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{;}
+\PYG{+w}{                        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{                    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{                }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{                }\PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{+}\PYG{o}{+}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                    }\PYG{k}{if}\PYG{p}{(}\PYG{n}{used}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                    }\PYG{n}{worker}\PYG{p}{[}\PYG{n}{matchjob}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{delta}\PYG{p}{;}
+\PYG{+w}{                    }\PYG{n}{job}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{delta}\PYG{p}{;}
+\PYG{+w}{                    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{                    }\PYG{k}{else}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                        }\PYG{n}{minslack}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{delta}\PYG{p}{;}
+\PYG{+w}{                    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{                }\PYG{p}{\PYGZcb{}}\PYG{+w}{ }
+\PYG{+w}{                }\PYG{n}{job0}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{job1}\PYG{p}{;}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k}{while}\PYG{p}{(}\PYG{n}{matchjob}\PYG{p}{[}\PYG{n}{job0}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{!}\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{+w}{            }\PYG{k}{do}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{job1}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{parentjob}\PYG{p}{[}\PYG{n}{job0}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{                }\PYG{n}{matchjob}\PYG{p}{[}\PYG{n}{job0}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{matchjob}\PYG{p}{[}\PYG{n}{job1}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{                }\PYG{n}{job0}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{job1}\PYG{p}{;}
+\PYG{+w}{            }\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k}{while}\PYG{p}{(}\PYG{n}{job0}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{        }\PYG{n}{assign}\PYG{p}{.}\PYG{n}{assign}\PYG{p}{(}\PYG{n}{n}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{+}\PYG{o}{+}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n}{assign}\PYG{p}{[}\PYG{n}{matchjob}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{;}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{        }\PYG{k}{return}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{n}{job}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\end{MintedVerbatim}

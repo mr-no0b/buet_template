@@ -1,0 +1,16 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{n}{ll}\PYG{+w}{ }\PYG{n+nf}{NoOfDigitInNFactInBaseB}\PYG{p}{(}\PYG{n}{ll}\PYG{+w}{ }\PYG{n}{N}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ll}\PYG{+w}{ }\PYG{n}{B}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{ll}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{ans}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{c+c1}{// Sum of logarithms: log(N!) = log(1) + log(2) + ... + log(N)}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{N}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{+}\PYG{o}{+}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{ans}\PYG{+w}{ }\PYG{o}{+}\PYG{o}{=}\PYG{+w}{ }\PYG{n}{log}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{c+c1}{// Convert log from base e to base B, then add 1 to get digit count}
+\PYG{+w}{    }\PYG{n}{ans}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ans}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{n}{log}\PYG{p}{(}\PYG{n}{B}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{ans}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ans}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{c+c1}{// Return the result as an integer (floor value)}
+\PYG{+w}{    }\PYG{k}{return}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{ll}\PYG{p}{)}\PYG{n}{ans}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}
