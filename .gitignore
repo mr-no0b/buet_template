@@ -1,15 +1,38 @@
 ## Ignore Latex temporary files
 *.aux
+*.bbl
+*.bcf
+*.blg
 *.fdb_latexmk
 *.fls
+*.lof
 *.log
+*.lot
+*.nav
 *.out
+*.run.xml
+*.snm
+*.synctex.gz
 *.toc
+*.vrb
+*.xdv
 contents.tex
 
 ## Generated LaTeX code directory and minted
 .latex_code/
 _minted/
+_minted*/
+
+## Local Python/agent environment
+.venv/
+.codex
+__pycache__/
+*.py[cod]
+
+## Local contest compile outputs
+a.out
+*.exe
+*.o
 
 ## Ignore vim swp files
 *.swp
@@ -365,4 +388,3 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
- 
